@@ -12,6 +12,7 @@ function DashProfile() {
   const [imageFileData, setImageFileData] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [formData, setFormData] = useState({});
+  const[showModel,setShowModel]=useState(false)
 
   // Handle image selection
   const handleImageChange = (e) => {
@@ -169,9 +170,12 @@ console.log(formData);
         </button>
       </form>
       <div className="flex justify-between mt-2 text-red-400">
-        <div className="cursor-pointer">Delete Account</div>
+        <div className="cursor-pointer"onClick={(()=>{
+          setShowModel(true)
+        })}>Delete Account</div>
         <div className="cursor-pointer">Sign Out</div>
       </div>
+   
     </div>
   );
 }
