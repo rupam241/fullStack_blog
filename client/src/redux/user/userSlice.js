@@ -22,13 +22,23 @@ const userSlice = createSlice({
             state.loading = false;
             state.error = action.payload; // Corrected assignment here
         },
-        resetState:(state,action)=>{
-            state.currentuser=null;
-           
-        }
+       updateStart:(state,action)=>{
+        state.loading = true;
+        state.error = null;
+       },
+       updateSucess:(state,action)=>{
+        state.currentuser=action.payload;
+        state.loading = false;
+        state.error=null
+
+       },
+       updateFailure: (state, action) => {
+        state.loading = false;
+        state.error = action.payload; // Corrected assignment here
+    },
         
     },
 });
 
-export const { signInStart, signInSuccess, signInFailure,resetState } = userSlice.actions;
+export const { signInStart, signInSuccess, signInFailure,updateFailure,updateStart,updateSucess } = userSlice.actions;
 export default userSlice.reducer;
