@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { changeImage } from "../redux/file/imageSlice";
+import { Link } from "react-router-dom";
 import {
   updateFailure,
   updateStart,
@@ -263,6 +264,12 @@ function DashProfile() {
           Sign Out
         </div>
       </div>
+     <Link to={'/create-post'}>
+     <div>
+        {currentuser.isAdmin &&(
+          <button type="button" className="w-full bg-gradient-to-r from-purple-500 to-green-500 p-2 rounded-full text-slate-300 font-bold  mt-2">Create Post</button>
+        )}
+      </div></Link>
 
       {/* Modal */}
       {showModal && (
