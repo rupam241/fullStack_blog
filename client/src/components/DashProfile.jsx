@@ -151,7 +151,7 @@ function DashProfile() {
 
   // handle account signout
 
-  const handleSignout = async () => {
+  const handleSignout = async (req,res,next) => {
     try {
       dispatch(signoutStart());
   
@@ -179,7 +179,7 @@ function DashProfile() {
       // e.g., window.location.href = "/login";
     } catch (error) {
       dispatch(signoutFailure("An error occurred during signout."));
-      console.error("Signout exception:", error);
+     next(error)
     }
   };
 

@@ -4,6 +4,7 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
+import { signoutFailure,signoutStart,signoutSucess } from "../redux/user/userSlice";
 
 // Assuming you have a logout action
 
@@ -48,6 +49,37 @@ const Header = () => {
       document.removeEventListener("click", closeMenu);
     };
   }, []);
+  const handleSignout = async (req,res,next) => {
+    try {
+      dispatch(signoutStart());
+  
+      const response = await fetch(`/api/user/signout/${currentuser._id}`, {
+        method: "DELETE", // Assuming signout is a POST request
+        headers: {
+          "Content-Type": "application/json",
+          // Include authorization token if required
+          Authorization: `Bearer ${currentuser.token}`,
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        dispatch(signoutFailure(data.message || "Signout failed."));
+        console.error("Signout error:", data.message);
+        return; // Exit if the signout fails
+      }
+  
+      dispatch(signoutSucess(data.message));
+      console.log("Signout successful:", data.message);
+  
+      // Perform additional actions like redirecting to login page
+      // e.g., window.location.href = "/login";
+    } catch (error) {
+      dispatch(signoutFailure("An error occurred during signout."));
+     next(error)
+    }
+  };
 
   return (
     <header className="p-5 border-b border-gray-500">
@@ -164,7 +196,7 @@ const Header = () => {
                   </Link>
                   <button
                     className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg"
-                    onClick={handleLogout}
+                    onClick={handleSignout}
                   >
                     Logout
                   </button>

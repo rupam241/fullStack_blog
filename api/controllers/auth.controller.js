@@ -46,7 +46,7 @@ export const signin = async (req, res, next) => {
         }
 
         const token = jwt.sign(
-            { id: validUser._id },
+            { id: validUser._id,isAdmin:validUser.isAdmin },
             process.env.JWT_SECRET,
             { expiresIn: '1h' } // Optional expiry time
         );
@@ -72,7 +72,7 @@ export const google = async (req, res, next) => {
         if (existingUser) {
             // Generate JWT token for existing user
             const token = jwt.sign(
-                { id: existingUser._id },
+                { id: existingUser._id ,isAdmin:existingUser.isAdmin},
                 process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
@@ -103,7 +103,7 @@ export const google = async (req, res, next) => {
 
             // Generate JWT for the new user
             const token = jwt.sign(
-                { id: newUser._id },
+                { id: newUser._id ,isAdmin:newUser.isAdmin},
                 process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
