@@ -65,3 +65,31 @@ export const deleteUser = async (req, res, next) => {
       }
 
 };
+
+
+export const signoutUser = async (req, res, next) => {
+  try {
+    // Authorization check
+    if (req.user.id !== req.params.userId) {
+      return res.status(403).json({ message: "You are not allowed to update this user" });
+    }
+
+    // Find the user by ID
+    const userMatch = await user.findById(req.params.userId);
+    if (!userMatch) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Delete cookie
+    res.clearCookie('access_token', { httpOnly: true, secure: true });
+
+    // Optional: Additional logout logic (if needed)
+    // user.isLoggedIn = false;
+    // await user.save();
+
+    return res.status(200).json({ message: "Successfully signed out" });
+  } catch (error) {
+    // Error handling
+    return res.status(500).json({ message: "An error occurred", error: error.message });
+  }
+};

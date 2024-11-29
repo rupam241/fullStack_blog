@@ -1,7 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { changeImage } from "../redux/file/imageSlice";
-import { updateFailure, updateStart, updateSucess } from "../redux/user/userSlice";
+import {
+  updateFailure,
+  updateStart,
+  updateSucess,
+  deleteAccountFailure,
+  deleteAccountSucess,
+  deleteAccountStart,
+ 
+  signoutStart,
+  signoutFailure,
+  signoutSucess,
+} from "../redux/user/userSlice";
 
 function DashProfile() {
   const dispatch = useDispatch();
@@ -12,7 +23,8 @@ function DashProfile() {
   const [imageFileData, setImageFileData] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [formData, setFormData] = useState({});
-  const[showModel,setShowModel]=useState(false)
+  const [showModal, setShowModal] = useState(false); // State for modal visibility
+  const [currentButton, setCurrentButton] = useState(null);
 
   // Handle image selection
   const handleImageChange = (e) => {
@@ -36,11 +48,10 @@ function DashProfile() {
     if (e.target.id === "profilePicture") {
       setFormData((prev) => ({
         ...prev,
-        profilePicture: profilePicture
+        profilePicture: profilePicture,
       }));
     }
   };
-console.log(formData);
 
   // Upload image to the server
   const uploadImage = async () => {
@@ -84,12 +95,12 @@ console.log(formData);
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!formData || Object.keys(formData).length === 0) {
       console.log("No changes made to the form.");
       return;
     }
-  
+
     try {
       dispatch(updateStart());
       const response = await fetch(`/api/user/update/${currentuser._id}`, {
@@ -99,7 +110,7 @@ console.log(formData);
         },
         body: JSON.stringify(formData),
       });
-  
+
       const data = await response.json();
       if (!response.ok) {
         dispatch(updateFailure(data.message));
@@ -109,6 +120,66 @@ console.log(formData);
     } catch (error) {
       dispatch(updateFailure("An error occurred during the update."));
       console.error("Error during user update:", error);
+    }
+  };
+
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    try {
+      dispatch(deleteAccountStart());
+      const response = await fetch(`/api/user/delete/${currentuser._id}`, {
+        method: "DELETE", // Make sure the HTTP method is DELETE
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        dispatch(deleteAccountFailure());
+      }
+
+      // Dispatch the action to update the state (you should define this action in your Redux slice)
+      dispatch(deleteAccountSucess()); // Ensure you have a corresponding action like deleteAccountAction()
+
+      console.log("Account deleted"); // Placeholder for deletion logic
+
+      setShowModal(false); // Close the modal after action
+    } catch (error) {
+      console.error("Error during account deletion:", error);
+    }
+  };
+  console.log(currentButton);
+
+  // handle account signout
+
+  const handleSignout = async () => {
+    try {
+      dispatch(signoutStart());
+  
+      const response = await fetch(`/api/user/signout/${currentuser._id}`, {
+        method: "DELETE", // Assuming signout is a POST request
+        headers: {
+          "Content-Type": "application/json",
+          // Include authorization token if required
+          Authorization: `Bearer ${currentuser.token}`,
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        dispatch(signoutFailure(data.message || "Signout failed."));
+        console.error("Signout error:", data.message);
+        return; // Exit if the signout fails
+      }
+  
+      dispatch(signoutSucess(data.message));
+      console.log("Signout successful:", data.message);
+  
+      // Perform additional actions like redirecting to login page
+      // e.g., window.location.href = "/login";
+    } catch (error) {
+      dispatch(signoutFailure("An error occurred during signout."));
+      console.error("Signout exception:", error);
     }
   };
 
@@ -169,13 +240,66 @@ console.log(formData);
           Update
         </button>
       </form>
+
       <div className="flex justify-between mt-2 text-red-400">
-        <div className="cursor-pointer"onClick={(()=>{
-          setShowModel(true)
-        })}>Delete Account</div>
-        <div className="cursor-pointer">Sign Out</div>
+        <div
+          className="cursor-pointer"
+          id="delete"
+          onClick={(e) => {
+            setCurrentButton(e.target.id);
+            setShowModal(true);
+          }} // Show modal on click
+        >
+          Delete Account
+        </div>
+        <div
+          className="cursor-pointer"
+          onClick={(e) => {
+            setCurrentButton(e.target.id);
+            setShowModal(true);
+          }}
+          id="signout"
+        >
+          Sign Out
+        </div>
       </div>
-   
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-semibold mb-4 text-center">
+              Are you sure?
+            </h2>
+            {currentButton === "delete" ? (
+              <p className="text-gray-500 mb-6 text-center">
+                Do you really want to delete your account? This action is
+                irreversible.
+              </p>
+            ) : (
+              " Do you really want to signout from your account? This action is irreversible."
+            )}
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={
+                  currentButton === "delete"
+                    ? handleDeleteAccount
+                    : handleSignout
+                }
+                className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() => setShowModal(false)} // Close modal
+                className="px-6 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500 focus:outline-none"
+              >
+                No, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
