@@ -5,7 +5,7 @@ import path from 'path';
 const storage = multer.diskStorage({
   // Specify where to store the uploaded file (in 'uploads' directory)
   destination: (req, file, cb) => {
-    // Use an absolute path to ensure correct directory location
+    // Ensure the 'uploads' folder exists and resolve the absolute path
     cb(null, path.resolve('uploads'));  // 'uploads' folder in the project root
   },
   // Specify how to name the uploaded file
@@ -22,15 +22,15 @@ const upload = multer({
     fileSize: 50 * 1024 * 1024,  // Limit the file size to 50MB (adjust as necessary)
   },
   fileFilter: (req, file, cb) => {
-    // Accept all file types by default
-    cb(null, true);  // Allow any file type
-    // You can add specific conditions here if you want to limit by MIME types (optional)
-    // if (file.mimetype.startsWith('image') || file.mimetype.startsWith('application')) {
-    //   cb(null, true);  // Allow image and application files
-    // } else {
-    //   cb(new Error('Only image and application files are allowed'), false);
-    // }
+    // Allow only images (you can adjust this as per your requirements)
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true);  // Allow the file if it matches one of the allowed types
+    } else {
+      cb(new Error('Only image files (jpeg, png, gif, jpg) are allowed'), false);
+    }
   },
 });
 
-export default upload;
+// Export multer upload for use in routes
+export default upload ;

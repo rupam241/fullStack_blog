@@ -9,7 +9,6 @@ import {
   deleteAccountFailure,
   deleteAccountSucess,
   deleteAccountStart,
- 
   signoutStart,
   signoutFailure,
   signoutSucess,
@@ -23,9 +22,16 @@ function DashProfile() {
   const filePickerRef = useRef();
   const [imageFileData, setImageFileData] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
-  const [formData, setFormData] = useState({});
-  const [showModal, setShowModal] = useState(false); // State for modal visibility
+
+  const [formData, setFormData] = useState({
+    username: currentuser?.username || "",
+    email: currentuser?.email || "",
+    password: "",
+    profilePicture: currentuser?.profilepicture || "",
+  });
+  const [showModal, setShowModal] = useState(false);
   const [currentButton, setCurrentButton] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);  // Track the submission status
 
   // Handle image selection
   const handleImageChange = (e) => {
@@ -33,7 +39,7 @@ function DashProfile() {
     if (imageFile && imageFile.type.startsWith("image/")) {
       const imageUrl = URL.createObjectURL(imageFile);
       setImageFileData(imageFile);
-      setImageFileUrl(imageUrl);
+      setImageFileUrl(imageUrl);  // Update the local image URL
     } else {
       console.log("Selected file is not an image");
     }
@@ -45,14 +51,8 @@ function DashProfile() {
       ...formData,
       [e.target.id]: e.target.value,
     });
-
-    if (e.target.id === "profilePicture") {
-      setFormData((prev) => ({
-        ...prev,
-        profilePicture: profilePicture,
-      }));
-    }
   };
+  console.log(formData)
 
   // Upload image to the server
   const uploadImage = async () => {
@@ -72,11 +72,15 @@ function DashProfile() {
       const data = await response.json();
 
       if (response.ok) {
-        dispatch(changeImage(data));
+        setImageFileUrl(data.file.url); // Set the uploaded image URL
         setFormData((prev) => ({
           ...prev,
-          profilepicture: data.file.url,
+          profilePicture: data.file.url, // Update formData with the new profile picture URL
         }));
+        dispatch(changeImage(data));
+        
+        
+        // Update Redux state with the new image data
         console.log("Image uploaded successfully:", data);
       } else {
         console.error("Image upload failed:", data);
@@ -97,12 +101,13 @@ function DashProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData || Object.keys(formData).length === 0) {
+    if (!formData || Object.keys(formData).length === 0 || isSubmitting) {
       console.log("No changes made to the form.");
       return;
     }
 
     try {
+      setIsSubmitting(true);  // Start submission process
       dispatch(updateStart());
       const response = await fetch(`/api/user/update/${currentuser._id}`, {
         method: "PUT",
@@ -115,12 +120,16 @@ function DashProfile() {
       const data = await response.json();
       if (!response.ok) {
         dispatch(updateFailure(data.message));
+        console.log(data);
+        
       } else {
         dispatch(updateSucess(data)); // Ensure `data` contains the updated user object
       }
     } catch (error) {
       dispatch(updateFailure("An error occurred during the update."));
       console.error("Error during user update:", error);
+    } finally {
+      setIsSubmitting(false);  // Reset submission status
     }
   };
 
@@ -138,51 +147,45 @@ function DashProfile() {
         dispatch(deleteAccountFailure());
       }
 
-      // Dispatch the action to update the state (you should define this action in your Redux slice)
-      dispatch(deleteAccountSucess()); // Ensure you have a corresponding action like deleteAccountAction()
-
-      console.log("Account deleted"); // Placeholder for deletion logic
-
+      dispatch(deleteAccountSucess());
+      console.log("Account deleted");
       setShowModal(false); // Close the modal after action
     } catch (error) {
       console.error("Error during account deletion:", error);
     }
   };
-  console.log(currentButton);
 
-  // handle account signout
-
-  const handleSignout = async (req,res,next) => {
+  // Handle signout
+  const handleSignout = async () => {
     try {
       dispatch(signoutStart());
-  
+
       const response = await fetch(`/api/user/signout/${currentuser._id}`, {
-        method: "DELETE", // Assuming signout is a POST request
+        method: "DELETE", 
         headers: {
           "Content-Type": "application/json",
-          // Include authorization token if required
           Authorization: `Bearer ${currentuser.token}`,
         },
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         dispatch(signoutFailure(data.message || "Signout failed."));
         console.error("Signout error:", data.message);
-        return; // Exit if the signout fails
+        return;
       }
-  
+
       dispatch(signoutSucess(data.message));
       console.log("Signout successful:", data.message);
-  
-      // Perform additional actions like redirecting to login page
-      // e.g., window.location.href = "/login";
+
     } catch (error) {
       dispatch(signoutFailure("An error occurred during signout."));
-     next(error)
+      console.error("Error during signout:", error);
     }
   };
+      
+          
 
   return (
     <div className="max-w-lg mx-auto p-3 w-full flex flex-col gap-1">
