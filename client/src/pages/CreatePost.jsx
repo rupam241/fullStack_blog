@@ -13,10 +13,10 @@ function CreatePost() {
             placeholder="Title requires "
             required
             id="title"
-            className="flex-1"
+            className="flex-1 outline-none border-2 border-teal-100 border-dotted p-3   "
           />
-          <select name="" id="">
-            <option value="uncategorized">Select a category</option>
+          <select name="" id="" className="p-1 rounded-lg">
+            <option value="uncategorized" className="">Select a category</option>
             <option value="javascript">Javascript</option>
             <option value="react">React.js</option>
             <option value="next">Next.js</option>
@@ -31,7 +31,8 @@ function CreatePost() {
             Upload Button
           </button>
         </div>
-        <ReactQuill theme="snow" placeholder="write somthing..." className="h-72 mb-12"/>
+        <ReactQuill theme="snow" placeholder="write somthing..." className="h-72 mb-12" required/>
+        <button className="w-full text-center bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-md mt-2">Publish </button>
       </form>
     </div>
   );
