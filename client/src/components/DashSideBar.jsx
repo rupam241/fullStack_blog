@@ -1,43 +1,70 @@
 import { HiUser } from "react-icons/hi";
-import {HiArrowSmRight} from "react-icons/hi"
+import { HiArrowSmRight,HiDocumentText } from "react-icons/hi";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import React from "react";
 
-function DashSideBar({tab}) {
-  return (
-    <div className=" flex flex-col gap-1">
-  <div className={`flex justify-between px-4 py-2 rounded-lg cursor-pointer items-center ${
-          tab === "profile" ? "bg-slate-100" : ""
-        }`}>
-    <div className="flex gap-2 items-center">
-      <div>
-        <HiUser />
-      </div>
-      <Link to='/dashboard?tab=profile'>
-      <div>Profile</div>
-      </Link>
-    </div>
-
-    {/* user */}
-    <div>User</div>
-  </div>
+function DashSideBar({ tab }) {
+ 
   
+  const { currentuser } = useSelector((state) => state.user);
+  return (
+    <div className=" flex flex-col gap- p-3">
+      <div
+        className={`flex justify-between px-4 py-2 rounded-lg cursor-pointer items-center ${
+          tab === "profile" ? "bg-slate-100" : ""
+        }`}
+      >
+        <div className="flex  gap-4">
+          <div className="flex gap-2 items-center ">
+            <div>
+              <HiUser />
+            </div>
 
-  {/* signout */}
-  <div className="flex justify-between  px-4 py-2 rounded-lg cursor-pointer hover:bg-slate-100">
-    <div className="flex gap-2 items-center">
-      <div>
-        <HiArrowSmRight />
+            <Link to="/dashboard?tab=profile">
+              <div>Profile</div>
+            </Link>
+          </div>
+
+          {/* user */}
+          <div className="bg-slate-400 rounded-lg">
+            {currentuser.isAdmin ? "Admin" : "user"}
+          </div>
+        </div>
       </div>
-      <div>Signout</div>
+
+      {/* posts */}
+
+        {currentuser.isAdmin && (
+        <div
+          className={`flex justify-between px-4 py-2 rounded-lg cursor-pointer items-center ${
+            tab === "posts" ? "bg-slate-100" : ""
+          }`}
+        >
+          <div className="flex gap-4">
+            <div className="flex gap-2 items-center">
+              <div>
+                <HiDocumentText />
+              </div>
+
+              <Link to="/dashboard?tab=posts">
+                <div>Posts</div>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* signout */}
+      <div className="flex justify-between  px-4 py-2 rounded-lg cursor-pointer hover:bg-slate-100">
+        <div className="flex gap-2 items-center">
+          <div>
+            <HiArrowSmRight />
+          </div>
+          <div>Signout</div>
+        </div>
+      </div>
     </div>
-
-   
-  </div>
-
-</div>
-
   );
 }
 

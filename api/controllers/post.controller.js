@@ -3,13 +3,11 @@ import File from "../models/image.model.js";
 import { errorHandler } from "../utils/error.js";
 
 export const createPost = async (req, res, next) => {
-  console.log(req.user.isAdmin);
-  if(!req.user.isAdmin){
-    next(errorHandler(404," you are not authorized"))
+  if (!req.user.isAdmin) {
+    next(errorHandler(404, " you are not authorized"));
   }
-  
 
-   try {
+  try {
     const { title, content, category, imageFileId } = req.body;
 
     // Validate required fields
@@ -22,7 +20,6 @@ export const createPost = async (req, res, next) => {
 
     // Find the image file by its ID (filename or ObjectId)
     const imageFile = await File.findOne({ filename: imageFileId });
-    console.log(imageFile);
 
     if (!imageFile) {
       return res.status(404).json({
@@ -59,5 +56,54 @@ export const createPost = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+export const getposts = async (req, res, next) => {
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDir = req.query.order === "asc" ? 1 : -1;
+
+    // Filters
+    const filters = {
+      ...(req.query.userId && { userId: req.query.userId }),
+      ...(req.query.category && { category: req.query.category }),
+      ...(req.query.slug && { slug: req.query.slug }),
+      ...(req.query.postId && { _id: req.query.postId }),
+      ...(req.query.searchTerm && {
+        $or: [
+          { title: { $regex: req.query.searchTerm, $options: "i" } },
+          { content: { $regex: req.query.searchTerm, $options: "i" } },
+        ],
+      }),
+    };
+
+    // Query with filters, sorting, and pagination
+    const posts = await Post.find(filters)
+      .sort({ updateAt: sortDir })
+      .skip(startIndex)
+      .limit(limit);
+
+    // Total count of filtered posts
+    const totalPosts = await Post.countDocuments(filters);
+
+    // Posts created in the last month
+    const now = new Date();
+    const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+    const lastMonthsPost = await Post.countDocuments({
+      ...filters,
+      createdAt: { $gte: oneMonthAgo },
+    });
+
+    // Response
+    res.status(200).json({
+      posts,
+      totalPosts,
+      lastMonthsPost,
+    });
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    next(error); // Pass error to middleware
   }
 };

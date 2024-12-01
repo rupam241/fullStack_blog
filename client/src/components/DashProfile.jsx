@@ -60,7 +60,7 @@ function DashProfile() {
       console.error("No file selected for upload.");
       return;
     }
-  console.log(imageFileData);
+  
   
     const uploadData = new FormData();
     uploadData.append("image", imageFileData);
@@ -75,7 +75,7 @@ function DashProfile() {
       });
       const data = await response.json();
 
-      console.log(data);
+     
       
      
 
@@ -128,7 +128,7 @@ function DashProfile() {
       const data = await response.json();
       if (!response.ok) {
         dispatch(updateFailure(data.message));
-        console.log(data);
+      
         
       } else {
         dispatch(updateSucess(data)); // Ensure `data` contains the updated user object
