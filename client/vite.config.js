@@ -1,16 +1,18 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindScrollbar from 'tailwind-scrollbar'
 
 export default defineConfig({
   server: {
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
-        changeOrigin: true,  // Add this line
+        changeOrigin: true,
         secure: false,
-        // Optionally you can add ws: true if you're using WebSocket
       }
     }
   },
-  plugins: [react()],
+  plugins: [ react(),
+    tailwindScrollbar(),
+  ],
 })
