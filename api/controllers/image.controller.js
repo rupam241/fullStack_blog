@@ -1,8 +1,14 @@
 import File from '../models/image.model.js'; 
 import cloudinary from '../config/cloudinary.js';
+import {errorHandler} from '../utils/error.js'
 
 // Function to handle the single image upload
-const uploadSingleImage = async (req, res) => {
+ const uploadSingleImage = async (req, res,next) => {
+
+  
+  
+
+  
   try {
     // Check if file is uploaded
     if (!req.file) {

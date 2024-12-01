@@ -52,7 +52,7 @@ function DashProfile() {
       [e.target.id]: e.target.value,
     });
   };
-  console.log(formData)
+  
 
   // Upload image to the server
   const uploadImage = async () => {
@@ -60,9 +60,13 @@ function DashProfile() {
       console.error("No file selected for upload.");
       return;
     }
-
+  console.log(imageFileData);
+  
     const uploadData = new FormData();
     uploadData.append("image", imageFileData);
+
+    
+    
 
     try {
       const response = await fetch("/api/files/upload-single", {
@@ -70,6 +74,10 @@ function DashProfile() {
         body: uploadData,
       });
       const data = await response.json();
+
+      console.log(data);
+      
+     
 
       if (response.ok) {
         setImageFileUrl(data.file.url); // Set the uploaded image URL
@@ -81,7 +89,7 @@ function DashProfile() {
         
         
         // Update Redux state with the new image data
-        console.log("Image uploaded successfully:", data);
+        
       } else {
         console.error("Image upload failed:", data);
       }
