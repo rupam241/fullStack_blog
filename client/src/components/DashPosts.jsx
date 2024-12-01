@@ -7,6 +7,8 @@ function DashPosts() {
   const { currentuser } = useSelector((state) => state.user);
   const [userPosts, setUserPosts] = useState([]);
   const [showMore, setShowMore] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [currentPost, setCurrentPost] = useState(null); // Store the post data to delete
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -18,7 +20,6 @@ function DashPosts() {
 
         if (res.ok) {
           setUserPosts(data.posts);
-          // If there are fewer than 9 posts, hide the "Show More" button
           if (data.posts.length < 9) {
             setShowMore(false);
           }
@@ -32,25 +33,46 @@ function DashPosts() {
     }
   }, [currentuser._id]);
 
-  const handleSUbmitMore=async()=>{
-    const startIndex=userPosts.length;
+  const handleSubmitMore = async () => {
+    const startIndex = userPosts.length;
     try {
-      const res=await fetch( `/api/posts/get-post?userId=${currentuser._id}&startIndex=${startIndex}`)
-      const data=  await res.json();
-      console.log(data)
-      if(res.ok){
-        setUserPosts((prev)=>[...prev,...data.posts])
-        if(data.posts.length<9){
+      const res = await fetch(
+        `/api/posts/get-post?userId=${currentuser._id}&startIndex=${startIndex}`
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setUserPosts((prev) => [...prev, ...data.posts]);
+        if (data.posts.length < 9) {
           setShowMore(false);
         }
-
       }
     } catch (error) {
       console.log(error.message);
-      
     }
+  };
 
-  }
+  const deletePost = async ({ postId, userId }) => {
+    try {
+      const res = await fetch(`/api/posts/delete-post/${postId}/${userId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUserPosts((prev) => prev.filter((post) => post._id !== postId));
+        setShowModal(false); // Close the modal
+        setCurrentPost(null); // Clear the current post
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
+    setCurrentPost(null); // Clear the current post when closing the modal
+  };
+  console.log(userPosts);
+  
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-5 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 ">
@@ -64,7 +86,7 @@ function DashPosts() {
             <Table.HeadCell>Delete</Table.HeadCell>
             <Table.HeadCell>Edit</Table.HeadCell>
           </Table.Head>
-          <Table.Body className="mt-20">
+          <Table.Body>
             {userPosts.map((post) => {
               const updatedDate = new Date(post.updatedAt).toLocaleDateString();
               return (
@@ -89,16 +111,22 @@ function DashPosts() {
                   </Table.Cell>
                   <Table.Cell>{post.category}</Table.Cell>
                   <Table.Cell>
-                    <span className="font-medium text-red-500 hover:underline cursor-pointer">
+                    <button
+                      onClick={() => {
+                        setShowModal(true);
+                        setCurrentPost(post); // Set the post to be deleted
+                      }}
+                      className="text-red-500 hover:underline"
+                    >
                       Delete
-                    </span>
+                    </button>
                   </Table.Cell>
                   <Table.Cell>
                     <Link
                       to={`/update-post/${post._id}`}
                       className="text-teal-500 hover:underline"
                     >
-                      <span>Edit</span>
+                      Edit
                     </Link>
                   </Table.Cell>
                 </Table.Row>
@@ -112,12 +140,43 @@ function DashPosts() {
 
       {/* Show More Button */}
       {showMore && (
-        <button 
-          className="w-full text-teal-500 self-center mt-4 border-2 p-3 mx-auto" // Added mx-auto for horizontal centering
-          onClick={handleSUbmitMore} // Handle show more logic here
+        <button
+          className="w-full text-teal-500 self-center mt-4 border-2 p-3 mx-auto"
+          onClick={handleSubmitMore}
         >
           Show More
         </button>
+      )}
+
+      {/* Modal for confirmation */}
+      {showModal && currentPost && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-semibold mb-4 text-center">
+              Are you sure?
+            </h2>
+            <p className="text-gray-500 mb-6 text-center">
+              Do you really want to delete this post? This action is
+              irreversible.
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() =>
+                  deletePost({ postId: currentPost._id, userId: currentuser._id })
+                }
+                className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={handleModalClose}
+                className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

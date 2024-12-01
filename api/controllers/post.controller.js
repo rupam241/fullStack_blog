@@ -90,7 +90,11 @@ export const getposts = async (req, res, next) => {
 
     // Posts created in the last month
     const now = new Date();
-    const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
     const lastMonthsPost = await Post.countDocuments({
       ...filters,
       createdAt: { $gte: oneMonthAgo },
@@ -105,5 +109,32 @@ export const getposts = async (req, res, next) => {
   } catch (error) {
     console.error("Error fetching posts:", error);
     next(error); // Pass error to middleware
+  }
+};
+
+export const deletePost = async (req, res, next) => {
+  // Logging the user information for debugging purposes
+
+
+  // Authorization check: User should be an admin OR the user should own the post
+  if (!req.user.isAdmin && req.user.id !== req.params.userId) {
+    return next(errorHandler(400, "You are not authorized to delete this post"));
+  }
+
+  try {
+    // Find and delete the post by its ID
+    const post = await Post.findByIdAndDelete(req.params.postId);
+
+    // If no post is found, return an error
+    if (!post) {
+      return next(errorHandler(404, "Post not found"));
+    }
+
+    // Success response
+    res.status(200).json('The post has been deleted');
+    
+  } catch (error) {
+    // Pass any errors to the error handler middleware
+    next(error);
   }
 };
