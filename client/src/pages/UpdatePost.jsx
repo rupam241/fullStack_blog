@@ -89,6 +89,7 @@ function UpdatePost() {
 
       if (res.ok) {
         alert("Post updated successfully");
+        navigate(`/post/${responseData.data.slug}`)
         // You can redirect or reset the form here if necessary
       } else {
         setError(responseData.error || "Error updating post");
