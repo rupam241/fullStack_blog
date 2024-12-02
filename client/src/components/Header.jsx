@@ -77,7 +77,8 @@ const Header = () => {
       // e.g., window.location.href = "/login";
     } catch (error) {
       dispatch(signoutFailure("An error occurred during signout."));
-     next(error)
+     console.log(error);
+     
     }
   };
 

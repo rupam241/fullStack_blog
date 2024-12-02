@@ -2,19 +2,21 @@ import React, { useState, useEffect } from "react";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function UpdatePost() {
-  const [imageChange, setImageChange] = useState(null);
-  const [imageData, setImageData] = useState(null);
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("uncategorized");
-  const [content, setContent] = useState("");
+  const [imageChange, setImageChange] = useState(null); // Tracks selected image for upload
+  const [imageData, setImageData] = useState(null); // Holds image URL for the post
+  const [title, setTitle] = useState(""); // Post title
+  const [category, setCategory] = useState("uncategorized"); // Post category
+  const [content, setContent] = useState(""); // Post content
   const [error, setError] = useState(""); // Error state to handle errors
 
   const navigate = useNavigate();
   const { postId } = useParams();
+  const { currentuser } = useSelector((state) => state.user);
 
-  // UseEffect to fetch post data
+  // UseEffect to fetch the post data on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -25,7 +27,7 @@ function UpdatePost() {
           setTitle(data.posts[0].title);
           setContent(data.posts[0].content);
           setCategory(data.posts[0].category);
-          setImageData(data.posts[0].imageUrl);
+          setImageData(data.posts[0].imageUrl); // Set the initial image URL
         }
       } catch (error) {
         console.error("Error fetching post:", error);
@@ -35,6 +37,7 @@ function UpdatePost() {
     fetchData();
   }, [postId]);
 
+  // Upload Image function
   const uploadImage = async () => {
     if (!imageChange) {
       alert("No image file uploaded");
@@ -50,12 +53,11 @@ function UpdatePost() {
         body: uploadData,
       });
       const getRes = await res.json();
-      console.log(getRes);
-      
+
 
       if (res.ok) {
-        setImageData(getRes.file.url); // Update imageData after successful upload
-        setImageChange(null); // Reset imageChange after upload
+        setImageData(getRes.file.url); // Update the image URL
+        setImageChange(null); // Reset the selected image
         alert("Image uploaded successfully");
       } else {
         alert("Image upload failed");
@@ -65,28 +67,29 @@ function UpdatePost() {
     }
   };
 
+  // Handle form submission (updating the post)
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch("/api/posts/update-post", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch(`/api/posts/update-post/${postId}/${currentuser._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          postId,
           title,
           category,
           content,
-          imageUrl: imageData,
+          imageUrl: imageData, // Include image URL in the request body
         }),
       });
+
       const responseData = await res.json();
-      console.log(responseData);
-      
 
       if (res.ok) {
         alert("Post updated successfully");
-        navigate("/posts");
+        // You can redirect or reset the form here if necessary
       } else {
         setError(responseData.error || "Error updating post");
       }
@@ -127,10 +130,10 @@ function UpdatePost() {
         {/* Image Upload Section */}
         <div className="flex flex-wrap gap-4 items-center justify-between border-4 border-teal-100 border-dotted p-3">
           {imageData && !imageChange ? (
-            // Display current image if no new file has been selected
+            // Show the current image if no new file is selected
             <div className="flex flex-col items-center gap-2">
               <img
-                src={imageData} // Display the image URL
+                src={imageData}
                 alt="Current Post"
                 className="w-full h-auto object-cover rounded-md"
               />
@@ -143,9 +146,8 @@ function UpdatePost() {
               </button>
             </div>
           ) : (
-            // Show the file input and upload button when the user clicks "Change Image" or no image exists
+            // Show file input and upload button if the user is changing the image
             <div className="flex items-center justify-between gap-4">
-              {/* File Input */}
               <input
                 type="file"
                 accept="image/*"
@@ -153,13 +155,11 @@ function UpdatePost() {
                 id="image"
                 onChange={(e) => setImageChange(e.target.files[0])}
               />
-
-              {/* Upload Button */}
               {imageChange && (
                 <button
                   type="button"
                   className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-md text-sm"
-                  onClick={uploadImage} // Trigger the upload function
+                  onClick={uploadImage} // Trigger image upload
                 >
                   Upload Image
                 </button>
@@ -186,7 +186,7 @@ function UpdatePost() {
           type="submit"
           className="w-full text-center bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-md mt-2"
         >
-          Publish
+          Update
         </button>
       </form>
     </div>

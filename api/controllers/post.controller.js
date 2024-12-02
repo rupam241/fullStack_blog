@@ -142,3 +142,39 @@ export const deletePost = async (req, res, next) => {
 
 
 
+
+export const updatePost = async (req, res) => {
+  if (!req.user.isAdmin && req.user.id !== req.params.userId) {
+    return errorHandler(400, "You are not authorized");
+  }
+ 
+ 
+  try {
+    // Extract updated fields from the request body
+   
+    const updateValue = await Post.findByIdAndUpdate(
+      req.params.postId, // The ID of the post to update
+      { $set: 
+        {
+          title:req.body.title,
+          content:req.body.content,
+          category:req.body.category,
+          imageUrl:req.body.imageUrl
+        }
+      }, // The fields to update with new values
+      { new: true } // Option to return the updated document
+    );
+
+    if (!updateValue) {
+      return errorHandler(404, "Post not found");
+    }
+
+    res.status(200).json({
+      success: true,
+      data: updateValue,
+      message: "Post updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
