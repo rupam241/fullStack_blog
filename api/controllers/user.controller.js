@@ -93,3 +93,30 @@ export const signoutUser = async (req, res, next) => {
     return res.status(500).json({ message: "An error occurred", error: error.message });
   }
 };
+
+
+export const getUser=async(req,res,next)=>{
+
+  if(!req.user.isAdmin ){
+    next(errorHandler(400,"you are not authorized to view "))
+  }
+  try {
+    const getUserData=await user.find();
+
+  
+    
+    if(( getUserData).length===0){
+      return res.status(404).json({ message: 'No users found'})
+    }
+
+    res.status(200).json({
+      success: true,
+      data: getUserData,
+    });
+  } catch (error) {
+    next(error)
+  }
+
+  
+
+}
