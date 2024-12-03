@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 function DashUsers() {
   const [userData, setUserData] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null); // State to hold the selected user ID
   const { currentuser } = useSelector((state) => state.user);
 
   const getUserData = async () => {
@@ -27,24 +28,27 @@ function DashUsers() {
   const users = userData ? userData.data : [];
 
   const handleDeleteClick = (userId) => {
-    setShowModal(true);
-    // Store the userId in state to use for deletion
-    setUserIdToDelete(userId);
+    setSelectedUserId(userId); // Store the selected user ID
+    setShowModal(true); // Show the confirmation modal
   };
 
   const deleteUser = async () => {
     try {
-      const res = await fetch(`/api/user/deleteUser/${userIdToDelete}`, {
+      const res = await fetch(`/api/user/delete/${selectedUserId}`, {
         method: "DELETE",
       });
+
       if (res.ok) {
-        // Remove the deleted user from the state
-        setUserData((prevData) =>
-          prevData.filter((user) => user._id !== userIdToDelete)
-        );
-        setShowModal(false);
-      } else {
-        console.error("Error deleting user");
+        // Update the UI after successful deletion
+        setUserData((prev) => ({
+          ...prev,
+          data: prev.data.filter((user) => user._id !== selectedUserId),
+        }));
+        setShowModal(false); // Close the modal
+        setSelectedUserId(null); // Clear the selected user ID
+      }
+      else{
+        console.log(data.message)
       }
     } catch (error) {
       console.error(error.message);
@@ -113,7 +117,10 @@ function DashUsers() {
                 Yes, Delete
               </button>
               <button
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setSelectedUserId(null);
+                }}
                 className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
               >
                 Cancel
