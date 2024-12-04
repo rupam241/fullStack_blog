@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaThumbsUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 
-function Comment({ comment, onLike }) {
+function Comment({ comment, onLike,onEdit }) {
   const [user, setUser] = useState(null); // State to store user data, initialized as null
   const [error, setError] = useState(null); // State for error handling
   const { currentuser } = useSelector((state) => state.user);
@@ -48,8 +48,10 @@ function Comment({ comment, onLike }) {
   const minutes = createDate.getMinutes().toString().padStart(2, "0"); // Add leading zero if minute is single digit
   const time = `${hours}:${minutes}`;
 
-  console.log("Likes array:", comment.likes);
-console.log("Current user ID:", currentuser?._id);
+
+ 
+console.log(comment);
+
 
   return (
     <div className="flex p-4 border-b  text-sm">
@@ -82,6 +84,8 @@ console.log("Current user ID:", currentuser?._id);
           >
             <FaThumbsUp className="text-sm" />
           </button>
+          <span>{comment.numberOfLikes}Likes</span>
+          <span onClick={()=>onEdit(comment._id,comment.userId)}>edit</span>
         </div>
       </div>
     </div>

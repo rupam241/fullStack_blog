@@ -77,3 +77,35 @@ export const likeComment=async(req,res,next)=>{
     next(error)
  }
 }
+
+
+
+export const editComment = async (req, res, next) => {
+  try {
+    // Check if the user is authorized to edit the comment
+    if (!req.user.isAdmin && req.user.id !== req.params.userId) {
+      return next(errorHandler(403, "You are not authorized to edit the comment"));
+    }
+
+    // Find and update the comment
+    const updatedComment = await Comment.findByIdAndUpdate(
+      req.params.commentId, // Assuming commentId is passed as a route parameter
+      req.body,             // Fields to update
+      { new: true }         // Return the updated document
+    );
+
+    // Handle the case where the comment is not found
+    if (!updatedComment) {
+      return next(errorHandler(404, "Comment not found"));
+    }
+
+    // Send a successful response
+    res.status(200).json({
+      message: "Comment updated successfully",
+      data: updatedComment, // Return the updated comment data
+    });
+  } catch (error) {
+    // Handle any errors that occur during the process
+    next(errorHandler(500, "An error occurred while updating the comment"));
+  }
+};
