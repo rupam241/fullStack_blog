@@ -19,30 +19,28 @@ import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx';
 import CreatePost from './pages/CreatePost.jsx';
 import UpdatePost from './pages/UpdatePost.jsx';
 import PostPage from './pages/PostPage.jsx';
-
+import ScrollToTop from './components/ScrollToTop.jsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       <Route path="/" element={<Layout />}>
-        <Route path="" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="about" element={<About />} />
         <Route path="signin" element={<SignIn />} />
         <Route path="signup" element={<SignUp />} />
-        
-        {/* Protecting Dashboard route with PrivateRoute */}
-        <Route element={<PrivateRoute />}> 
+
+        {/* Protected Dashboard */}
+        <Route element={<PrivateRoute />}>
           <Route path="dashboard" element={<DashBoard />} />
         </Route>
 
-        {/* Protecting fro isAdmin */}
-
-        <Route element={<OnlyAdminPrivateRoute />}> 
+        {/* Admin-only Routes */}
+        <Route element={<OnlyAdminPrivateRoute />}>
           <Route path="create-post" element={<CreatePost />} />
-          <Route path="update-post/:postId" element={<UpdatePost/>} />
+          <Route path="update-post/:postId" element={<UpdatePost />} />
         </Route>
 
-       
         <Route path="projects" element={<Projects />} />
         <Route path="/post/:postSlug" element={<PostPage />} />
       </Route>
@@ -54,8 +52,10 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
       <ThemeProvider>
-        <PersistGate loading={null} persistor={persistor}>
-          <RouterProvider router={router} />
+        <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
+          <RouterProvider router={router}>
+            <ScrollToTop />
+          </RouterProvider>
         </PersistGate>
       </ThemeProvider>
     </Provider>

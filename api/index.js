@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.route.js";
 import imageFileRoutes from "./routes/files.route.js"
 import cookieParser from 'cookie-parser';
 import postRouter from "./routes/post.route.js"
+import commentRouter from "./routes/comment.route.js"
 
 
 import cors from 'cors';
@@ -39,6 +40,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/auth',authRoutes);
 app.use('/api/files',imageFileRoutes)
 app.use('/api/posts',postRouter)
+app.use('/api/comment',commentRouter)
 
 
 

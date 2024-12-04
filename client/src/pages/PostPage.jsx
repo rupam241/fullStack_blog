@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Post from "../../../api/models/post.model";
 import CallToAction from "../components/CallToAction";
+import CommentSection from "../components/CommentSection";
 
 function PostPage() {
   const { postSlug } = useParams();
@@ -35,7 +36,7 @@ function PostPage() {
     fetchPost();
   }, [postSlug]);
 
-  console.log(post);
+
 
   if (loading)
     return (
@@ -74,6 +75,7 @@ function PostPage() {
         className="p-3 max-w-2xl  mx-auto w-full post-content"
       ></div>
       <div className="max-w-4xl mx-auto w-full"><CallToAction/></div>
+      <div><CommentSection postId={post._id}/></div>
     </main>
   );
 }
