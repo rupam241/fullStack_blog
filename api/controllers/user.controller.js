@@ -120,3 +120,25 @@ export const getUser=async(req,res,next)=>{
   
 
 }
+
+// comment section
+
+
+
+export const getUsers = async (req, res, next) => {
+  try {
+    // Fetch user by ID
+    const userData = await user.findById(req.params.userId);
+    if (!userData) {
+      return next(errorHandler(404, "User not found")); // Pass error to middleware
+    }
+
+    // Exclude sensitive data (like password) before sending the response
+    const { password, ...rest } = userData._doc;
+
+    res.status(200).json(rest); // Send filtered user data
+  } catch (error) {
+    // Handle any other errors
+    return next(errorHandler(500, "An error occurred while fetching the user."));
+  }
+};
