@@ -10,5 +10,5 @@ router.put('/update/:userId',verifyToken  ,updateUser)
 router.delete('/delete/:userId',verifyToken,deleteUser)
 router.delete('/signout/:userId',verifyToken,signoutUser)
 router.get('/getUsers',verifyToken,getUser)
-router.get('/:userId',getUsers) //comment
+router.get('/:userId',getUsers) //comment section use
 export default router;

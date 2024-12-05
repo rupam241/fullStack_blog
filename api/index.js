@@ -7,12 +7,13 @@ import imageFileRoutes from "./routes/files.route.js"
 import cookieParser from 'cookie-parser';
 import postRouter from "./routes/post.route.js"
 import commentRouter from "./routes/comment.route.js"
-
+import path from 'node:path'
 
 import cors from 'cors';
 
 // Load environment variables from .env file
 dotenv.config();
+const __dirname=path.resolve()
 
 const app = express();
 app.use(express.json());
@@ -41,6 +42,12 @@ app.use('/api/auth',authRoutes);
 app.use('/api/files',imageFileRoutes)
 app.use('/api/posts',postRouter)
 app.use('/api/comment',commentRouter)
+
+app.use(express.static(path.join(__dirname,'/client/dist')))
+
+app.get('*',(req,res)=>{
+    res.sendFile(path.join(__dirname,'client','dist','index.html'))
+})
 
 
 

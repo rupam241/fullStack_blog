@@ -12,6 +12,8 @@ function DashUsers() {
     try {
       const res = await fetch("/api/user/getUsers");
       const data = await res.json();
+   
+      
       if (res.ok) {
         setUserData(data); // Assuming `data` contains the response object with `data` array
       }

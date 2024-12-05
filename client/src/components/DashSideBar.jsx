@@ -12,6 +12,27 @@ function DashSideBar({ tab }) {
   const { currentuser } = useSelector((state) => state.user);
   return (
     <div className=" flex flex-col gap- p-3">
+
+      {/* dash */}
+      {currentuser.isAdmin && (
+        <div
+          className={`flex justify-between px-4 py-2 rounded-lg cursor-pointer items-center ${
+            tab === "dash" ? "bg-slate-100" : ""
+          }`}
+        >
+          <div className="flex gap-4">
+            <div className="flex gap-2 items-center">
+              <div>
+              <FaComment />
+              </div>
+
+              <Link to="/dashboard?tab=dash">
+                <div>Dashboard</div>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
       <div
         className={`flex justify-between px-4 py-2 rounded-lg cursor-pointer items-center ${
           tab === "profile" ? "bg-slate-100" : ""
@@ -99,6 +120,7 @@ function DashSideBar({ tab }) {
           </div>
         </div>
       )}
+
       {/* signout */}
       <div className="flex justify-between  px-4 py-2 rounded-lg cursor-pointer hover:bg-slate-100">
         <div className="flex gap-2 items-center">
