@@ -71,7 +71,7 @@ function DashPosts() {
     setShowModal(false);
     setCurrentPost(null); // Clear the current post when closing the modal
   };
-  console.log(userPosts);
+
   
 
   return (

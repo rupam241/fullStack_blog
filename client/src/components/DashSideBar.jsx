@@ -1,5 +1,6 @@
 import { HiUser } from "react-icons/hi";
 import { HiArrowSmRight,HiDocumentText } from "react-icons/hi";
+import { FaComment } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -88,7 +89,7 @@ function DashSideBar({ tab }) {
           <div className="flex gap-4">
             <div className="flex gap-2 items-center">
               <div>
-                <HiDocumentText />
+              <FaComment />
               </div>
 
               <Link to="/dashboard?tab=comments">
