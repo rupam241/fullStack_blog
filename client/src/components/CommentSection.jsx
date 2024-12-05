@@ -111,28 +111,18 @@ function CommentSection({ postId }) {
       console.log(error.message);
     }
   };
-const handleDelete=async(commentId,userId)=>{
-  if(!currentuser.isAdmin || currentuser._id!==userId){
-    console.log("you are not authorized to do this");
-    
-  }
+  const handleEdit = async (comment, editedComment) => {
+    setComments(
+      comments.map((c) =>
+        c._id === comment._id ? { ...c, content: editedComment } : c
+      )
+    );
+  };
 
-  try {
-    const res=await fetch(`/api/comment/editComment/${commentId}/${userId}`,{
-      method:"PUT"
-    })
-    if(res.ok){
-      const data=await res.json();
-      console.log(data);
-      
-    }
-    
-  } catch (error) {
-    
-  }
+  const handleDelete = async (comment) => {
+    setComments(comments.filter((d) => d._id !== comment._id)); // Use _id instead of id
+  };
   
-
-}
   return (
     <div className="max-w-2xl mx-auto w-full p-3">
       {isLoading ? (
@@ -230,7 +220,9 @@ const handleDelete=async(commentId,userId)=>{
                 key={comment._id || index}
                 comment={comment}
                 onLike={handleLike}
-                onEdit={handleDelete}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+             
               />
             );
           })}
