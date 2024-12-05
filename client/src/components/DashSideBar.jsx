@@ -77,6 +77,27 @@ function DashSideBar({ tab }) {
           </div>
         </div>
       )}
+
+      {/* comments */}
+      {currentuser.isAdmin && (
+        <div
+          className={`flex justify-between px-4 py-2 rounded-lg cursor-pointer items-center ${
+            tab === "comments" ? "bg-slate-100" : ""
+          }`}
+        >
+          <div className="flex gap-4">
+            <div className="flex gap-2 items-center">
+              <div>
+                <HiDocumentText />
+              </div>
+
+              <Link to="/dashboard?tab=comments">
+                <div>Comment</div>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
       {/* signout */}
       <div className="flex justify-between  px-4 py-2 rounded-lg cursor-pointer hover:bg-slate-100">
         <div className="flex gap-2 items-center">

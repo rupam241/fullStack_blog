@@ -133,3 +133,16 @@ export const deleteComment = async (req, res, next) => {
       return next(errorHandler(500, "An error occurred while deleting the comment"));
     }
   };
+
+  export const getDashComment = async (req, res, next) => {
+    try {
+      const comments = await Comment.find(); // Renamed to avoid conflict with res
+      res.status(200).json({
+        message: "Get comment",
+        data: comments, // Returning the fetched comments
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  
