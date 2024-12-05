@@ -5,12 +5,14 @@ import { Link } from "react-router-dom";
 import Post from "../../../api/models/post.model";
 import CallToAction from "../components/CallToAction";
 import CommentSection from "../components/CommentSection";
+import PostCart from "../components/PostCart";
 
 function PostPage() {
   const { postSlug } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [post, setPost] = useState();
+  const [recentPosts, setRecentPosts] = useState([]);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -35,8 +37,21 @@ function PostPage() {
     };
     fetchPost();
   }, [postSlug]);
+  useEffect(() => {
+    const recentpostsFun = async () => {
+      try {
+        const res = await fetch("/api/posts/get-post?limit=3");
 
-
+        if (res.ok) {
+          const data = await res.json(); // Get the response data
+          setRecentPosts(data.posts); // Set the posts data
+        }
+      } catch (error) {
+        console.error("Error fetching recent posts:", error); // Handle error
+      }
+    };
+    recentpostsFun();
+  }, []);
 
   if (loading)
     return (
@@ -74,8 +89,20 @@ function PostPage() {
         dangerouslySetInnerHTML={{ __html: post && post.content }}
         className="p-3 max-w-2xl  mx-auto w-full post-content"
       ></div>
-      <div className="max-w-4xl mx-auto w-full"><CallToAction/></div>
-      <div><CommentSection postId={post._id}/></div>
+      <div className="max-w-4xl mx-auto w-full">
+        <CallToAction />
+      </div>
+      <div>
+        <CommentSection postId={post._id} />
+      </div>
+      <div className="flex flex-col justify-center items-center mb-5">
+        <h1 className="text-xl mt-5">Recent aricles</h1>
+        <div className="flex flex-wrap gap-5 mt-5 justify-center"> 
+          {recentPosts.map((post) => {
+            return <PostCart key={post._id} post={post} />;
+          })}
+        </div>
+      </div>
     </main>
   );
 }
