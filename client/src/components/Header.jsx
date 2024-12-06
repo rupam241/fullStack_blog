@@ -98,14 +98,17 @@ const Header = () => {
 
         {/* Search for Desktop */}
         <form className="hidden lg:inline">
-          <div className="relative flex items-center">
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full p-2 pr-10 rounded border border-gray-300 outline-0"
-            />
-            <AiOutlineSearch className="absolute right-2 text-gray-400 cursor-pointer w-6 h-6" />
-          </div>
+        <Link to={'/search'}>
+        <div className="relative flex items-center">
+           
+           <input
+             type="text"
+             placeholder="Search..."
+             className="w-full p-2 pr-10 rounded border border-gray-300 outline-0" 
+           />
+           <AiOutlineSearch className="absolute right-2 text-gray-400 cursor-pointer w-6 h-6" />
+         </div></Link>
+         
         </form>
 
         {/* Hamburger Icon */}
