@@ -122,6 +122,8 @@ function CreatePost() {
             <option value="javascript">JavaScript</option>
             <option value="react">React.js</option>
             <option value="next">Next.js</option>
+            <option value="array">Array</option>
+            <option value="string">String</option>
           </select>
         </div>
 

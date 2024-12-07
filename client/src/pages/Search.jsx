@@ -139,6 +139,8 @@ function Search() {
               <option value="reactjs">React.js</option>
               <option value="nextjs">Next.js</option>
               <option value="javascript">JavaScript</option>
+              <option value="array">Array</option>
+              <option value="string">String</option>
             </select>
           </div>
           <button
